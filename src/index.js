@@ -10,6 +10,7 @@ import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { getMainDefinition } from 'apollo-utilities';
 
+import AddCombatant from './components/AddCombatant';
 import CombatantList from './components/CombatantList';
 import registerServiceWorker from './registerServiceWorker';
 
@@ -60,7 +61,10 @@ const client = new ApolloClient({
 ReactDOM.render(
   <Router>
     <ApolloProvider client={client}>
-      <CombatantList />
+      <div>
+        <CombatantList />
+        <AddCombatant />
+      </div>
     </ApolloProvider>
   </Router>,
   document.getElementById('root'),

@@ -1,6 +1,6 @@
 import { gql } from 'apollo-client-preset';
 import React, { Component } from 'react';
-import { map } from 'lodash';
+import { map, reject } from 'lodash';
 
 class CombatantList extends Component {
   static defaultProps = {};
@@ -16,37 +16,55 @@ class CombatantList extends Component {
       document: gql`
         subscription {
           Combatant {
+            mutation
             node {
               id
               name
               initiative
               turnOver
             }
+            previousValues {
+              id
+            }
           }
         }
       `,
-      updateQuery: (
-        previous,
-        {
-          subscriptionData,
-          subscriptionData: { data: { Combatant } },
-          ...rest
-        },
-      ) => {
+      updateQuery: (previous, response) => {
         console.log('CombatantList _subscribeToCombatants update:');
         console.log('previous: \n', previous);
-        console.log('subscriptionData: \n', { ...rest, subscriptionData });
+        console.log('response: \n', response);
 
-        // replace updated combatant with new one
-        // TODO: what about creation and deletion?
-        // create updateResource, addResource, deleteResource helpers
-        return {
-          ...previous,
-          allCombatants: map(
-            previous.allCombatants,
-            c => (c.id === Combatant.id ? Combatant : c),
-          ),
-        };
+        const {
+          subscriptionData: {
+            data: { Combatant: { mutation, node: Combatant, previousValues } },
+          },
+        } = response;
+
+        switch (mutation) {
+          case 'CREATED':
+            return {
+              ...previous,
+              allCombatants: [...previous.allCombatants, Combatant],
+            };
+          case 'DELETED':
+            return {
+              ...previous,
+              allCombatants: reject(previous.allCombatants, {
+                id: previousValues.id,
+              }),
+            };
+          case 'UPDATED':
+            return {
+              ...previous,
+              allCombatants: map(
+                previous.allCombatants,
+                c => (c.id === Combatant.id ? Combatant : c),
+              ),
+            };
+          default:
+            console.error(`unknown mutation type ${mutation}`);
+            return previous;
+        }
       },
     });
   };

@@ -1,6 +1,13 @@
 import { gql } from 'apollo-client-preset';
+import { map, reject, orderBy } from 'lodash';
 import React, { Component } from 'react';
-import { map, reject } from 'lodash';
+import styled from 'styled-components';
+import Combatant from '../Combatant';
+
+export const CombatantListWrapper = styled.div`
+  width: 500px;
+  margin: 0 auto;
+`;
 
 class CombatantList extends Component {
   static defaultProps = {};
@@ -71,23 +78,20 @@ class CombatantList extends Component {
 
   render() {
     if (this.props.data && this.props.data.loading) {
-      return <div>Loading</div>;
+      return <CombatantListWrapper>Loading</CombatantListWrapper>;
     }
 
     if (this.props.data && this.props.data.error) {
-      return <div>Error</div>;
+      return <CombatantListWrapper>Error</CombatantListWrapper>;
     }
 
     return (
-      <div>
-        {this.props.data.allCombatants.map(
-          ({ id, name, initiative, turnOver }) => (
-            <div key={id}>
-              <input type="checkbox" checked={turnOver} /> {name} {initiative}
-            </div>
-          ),
+      <CombatantListWrapper>
+        {map(
+          orderBy(this.props.data.allCombatants, ['initiative'], ['desc']),
+          combatant => <Combatant key={combatant.id} combatant={combatant} />,
         )}
-      </div>
+      </CombatantListWrapper>
     );
   }
 }

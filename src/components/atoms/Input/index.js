@@ -3,7 +3,6 @@ import styled from 'styled-components';
 const TextInput = styled.input.attrs({
   type: 'text',
 })`
-  appearance: none;
   background: transparent;
   border: none;
   border-bottom: 1px solid yellow;

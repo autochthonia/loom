@@ -19,73 +19,27 @@ class Combatant extends Component {
       initiative: PropTypes.number,
       turnOver: PropTypes.bool,
     }).isRequired,
-    debounce: PropTypes.bool,
   };
-  static defaultProps = {
-    debounce: true,
-  };
-  constructor(props) {
-    super(props);
-    this.state = {
-      id: null,
-      name: null,
-      initiative: null,
-      turnOver: null,
-      ...props.combatant,
-    };
-    this.debounce = props.debounce
-      ? debounce(payload => {
-          console.log(payload);
-          return this._updateCombatant(payload);
-        }, 4000)
-      : payload => this._updateCombatant(payload);
-  }
-
-  componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
-    if (nextProps.combatant !== this.props.combatant) {
-      console.log(`combatant ${this.props.combatant.id} updated`);
-      this.setState({
-        ...nextProps.combatant,
-      });
-    }
-  }
-
-  _debounceCombatantUpdates = payload => {
-    this.setState(
-      {
-        ...payload,
-      },
-      () => {
-        try {
-          this.debounce(this.state);
-        } catch (e) {
-          console.error(e);
-        }
-      },
-    );
-  };
+  static defaultProps = {};
 
   _updateCombatant = async payload => {
     console.log('!!! UPDATE COMBATANT !!!');
-    const response = await this.props.mutate({
-      variables: {
-        ...this.props.combatant,
-        ...payload,
-      },
+    const response = await this.props.submit({
+      ...this.props.combatant,
+      ...payload,
     });
     // console.log(response);
   };
 
   render() {
-    const { name, initiative, id, turnOver } = this.state;
+    const { name, initiative, id, turnOver } = this.props.combatant;
     return (
       <CombatantWrapper>
         <Checkbox
           checked={turnOver}
           onChange={() => {
             console.log('clicking checkbox');
-            this._debounceCombatantUpdates({
+            this._updateCombatant({
               turnOver: !this.props.combatant.turnOver,
             });
           }}
@@ -93,8 +47,8 @@ class Combatant extends Component {
         <NumberInput
           value={initiative}
           onChange={({ target: { value } }) =>
-            this._debounceCombatantUpdates({
-              initiative: parseInt(value, 10),
+            this._updateCombatant({
+              initiative: parseInt(value, 10) || 0,
             })
           }
         />
@@ -102,7 +56,7 @@ class Combatant extends Component {
         <TextInput
           value={name}
           onChange={({ target: { value } }) =>
-            this._debounceCombatantUpdates({
+            this._updateCombatant({
               name: value,
             })
           }

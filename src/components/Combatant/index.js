@@ -24,4 +24,19 @@ const query = gql`
   }
 `;
 
-export default graphql(query)(Combatant);
+export default graphql(query, {
+  props: ({ ownProps, mutate }) => ({
+    submit: Combatant => {
+      return mutate({
+        variables: { ...Combatant },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          updateCombatant: {
+            __typename: 'Combatant',
+            ...Combatant,
+          },
+        },
+      });
+    },
+  }),
+})(Combatant);

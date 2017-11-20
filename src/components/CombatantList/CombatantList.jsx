@@ -1,8 +1,9 @@
-import { gql } from 'apollo-client-preset';
-import { map, reject, orderBy } from 'lodash';
+import { map, get, orderBy } from 'lodash';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+
 import Combatant from '../Combatant';
+import mergeSorted from '../../utilities/mergeSorted';
 
 export const CombatantListWrapper = styled.div`
   width: 500px;
@@ -12,71 +13,22 @@ export const CombatantListWrapper = styled.div`
 class CombatantList extends Component {
   static defaultProps = {};
   static propTypes = {};
-  state = {};
-
-  componentDidMount() {
-    this._subscribeToCombatants();
-  }
-
-  _subscribeToCombatants = () => {
-    this.props.data.subscribeToMore({
-      document: gql`
-        subscription {
-          Combatant {
-            mutation
-            node {
-              id
-              name
-              initiative
-              turnOver
-            }
-            previousValues {
-              id
-            }
-          }
-        }
-      `,
-      updateQuery: (previous, response) => {
-        console.log('CombatantList _subscribeToCombatants update:');
-        console.log('previous: \n', previous);
-        console.log('response: \n', response);
-
-        const {
-          subscriptionData: {
-            data: { Combatant: { mutation, node: Combatant, previousValues } },
-          },
-        } = response;
-
-        switch (mutation) {
-          case 'CREATED':
-            return {
-              ...previous,
-              allCombatants: [...previous.allCombatants, Combatant],
-            };
-          case 'DELETED':
-            return {
-              ...previous,
-              allCombatants: reject(previous.allCombatants, {
-                id: previousValues.id,
-              }),
-            };
-          case 'UPDATED':
-            return {
-              ...previous,
-              allCombatants: map(
-                previous.allCombatants,
-                c => (c.id === Combatant.id ? Combatant : c),
-              ),
-            };
-          default:
-            console.error(`unknown mutation type ${mutation}`);
-            return previous;
-        }
-      },
-    });
+  state = {
+    sortedCombatants: get(this.props, 'data.allCombatants', []),
   };
 
+  componentDidMount() {
+    this.props.subscribeToCombatantUpdates();
+  }
+
+  componentWillReceiveProps({ data: { allCombatants = [] } = {} } = {}) {
+    this.setState({
+      sortedCombatants: mergeSorted(this.state.sortedCombatants, allCombatants),
+    });
+  }
+
   render() {
+    console.debug('CombatantList props:\n', this.props);
     if (this.props.data && this.props.data.loading) {
       return <CombatantListWrapper>Loading</CombatantListWrapper>;
     }
@@ -87,10 +39,22 @@ class CombatantList extends Component {
 
     return (
       <CombatantListWrapper>
-        {map(
-          orderBy(this.props.data.allCombatants, ['initiative'], ['desc']),
-          combatant => <Combatant key={combatant.id} combatant={combatant} />,
-        )}
+        {map(this.state.sortedCombatants, combatant => (
+          <Combatant key={combatant.id} combatant={combatant} />
+        ))}
+        <button
+          onClick={() =>
+            this.setState({
+              sortedCombatants: orderBy(
+                this.state.sortedCombatants,
+                ['initiative'],
+                ['desc'],
+              ),
+            })
+          }
+        >
+          Sort Combatants
+        </button>
       </CombatantListWrapper>
     );
   }

@@ -23,8 +23,8 @@ class Combatant extends Component {
   static defaultProps = {};
 
   _updateCombatant = async payload => {
-    console.log('!!! UPDATE COMBATANT !!!');
-    const response = await this.props.submit({
+    console.debug('!!! UPDATE COMBATANT !!!');
+    const response = await this.props.updateCombatant({
       ...this.props.combatant,
       ...payload,
     });
@@ -61,6 +61,7 @@ class Combatant extends Component {
             })
           }
         />
+        <button onClick={this.props.deleteCombatant}>X</button>
       </CombatantWrapper>
     );
   }

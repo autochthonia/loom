@@ -19,8 +19,11 @@ class Combatant extends Component {
       initiative: PropTypes.number,
       turnOver: PropTypes.bool,
     }).isRequired,
+    debounce: PropTypes.bool,
   };
-  static defaultProps = {};
+  static defaultProps = {
+    debounce: true,
+  };
   constructor(props) {
     super(props);
     this.state = {
@@ -28,13 +31,14 @@ class Combatant extends Component {
       name: null,
       initiative: null,
       turnOver: null,
-      updates: 0,
       ...props.combatant,
     };
-    this.debounce = debounce(payload => {
-      console.log(payload);
-      return this._updateCombatant(payload);
-    }, 4000);
+    this.debounce = props.debounce
+      ? debounce(payload => {
+          console.log(payload);
+          return this._updateCombatant(payload);
+        }, 4000)
+      : payload => this._updateCombatant(payload);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -51,7 +55,6 @@ class Combatant extends Component {
     this.setState(
       {
         ...payload,
-        updates: this.state.updates + 1,
       },
       () => {
         try {
@@ -80,11 +83,12 @@ class Combatant extends Component {
       <CombatantWrapper>
         <Checkbox
           checked={turnOver}
-          onChange={() =>
+          onChange={() => {
+            console.log('clicking checkbox');
             this._debounceCombatantUpdates({
               turnOver: !this.props.combatant.turnOver,
-            })
-          }
+            });
+          }}
         />
         <NumberInput
           value={initiative}

@@ -21,9 +21,13 @@ class CombatantList extends Component {
     this.props.subscribeToCombatantUpdates();
   }
 
-  componentWillReceiveProps({ data: { allCombatants = [] } = {} } = {}) {
+  componentWillReceiveProps(nextProps) {
+    console.warn('CombatantList componentWillReceiveProps - has allCombatants changed?');
     this.setState({
-      sortedCombatants: mergeSorted(this.state.sortedCombatants, allCombatants),
+      sortedCombatants: mergeSorted(
+        this.state.sortedCombatants,
+        get(nextProps, 'data.allCombatants', []),
+      ),
     });
   }
 

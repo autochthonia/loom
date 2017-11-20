@@ -11,13 +11,24 @@ class CombatantList extends Component {
   };
 
   _createCombatant = async () => {
-    const { name, initiative } = this.state;
-    await this.props.mutate({
-      variables: {
-        name,
-        initiative: parseInt(initiative, 10),
-      },
-    });
+    const { name = '', initiative = 0 } = this.state;
+    await this.props
+      .mutate({
+        variables: {
+          name: name || '',
+          initiative: parseInt(initiative, 10) || 0,
+        },
+      })
+      .then(res => {
+        console.log(res);
+        this.setState({
+          name: '',
+          initiative: 0,
+        });
+      })
+      .catch(e => {
+        console.error(e);
+      });
   };
 
   render() {
@@ -40,7 +51,8 @@ class CombatantList extends Component {
         <input
           value={this.state.initiative}
           onChange={({ target: { value } }) =>
-            this.setState({ initiative: value })}
+            this.setState({ initiative: value })
+          }
           type="number"
         />
         <input

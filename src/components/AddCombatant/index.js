@@ -22,4 +22,5 @@ const query = gql`
   }
 `;
 
+// TODO: addCombatant optimisticResponse
 export default graphql(query)(AddCombatant);

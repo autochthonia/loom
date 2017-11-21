@@ -1,7 +1,8 @@
-import { map, get, orderBy } from 'lodash';
+import { map, get, orderBy, head } from 'lodash';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import ActiveCombatant from '../ActiveCombatant';
 import Combatant from '../Combatant';
 import mergeSorted from '../../utilities/mergeSorted';
 
@@ -22,7 +23,9 @@ class CombatantList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.warn('CombatantList componentWillReceiveProps - has allCombatants changed?');
+    console.warn(
+      'CombatantList componentWillReceiveProps - has allCombatants changed?',
+    );
     this.setState({
       sortedCombatants: mergeSorted(
         this.state.sortedCombatants,
@@ -30,6 +33,9 @@ class CombatantList extends Component {
       ),
     });
   }
+
+  getSortedCombatants = () =>
+    orderBy(this.state.sortedCombatants, ['initiative'], ['desc']);
 
   render() {
     console.debug('CombatantList props:\n', this.props);
@@ -43,17 +49,14 @@ class CombatantList extends Component {
 
     return (
       <CombatantListWrapper>
+        <ActiveCombatant activeCombatant={head(this.getSortedCombatants())} />
         {map(this.state.sortedCombatants, combatant => (
           <Combatant key={combatant.id} combatant={combatant} />
         ))}
         <button
           onClick={() =>
             this.setState({
-              sortedCombatants: orderBy(
-                this.state.sortedCombatants,
-                ['initiative'],
-                ['desc'],
-              ),
+              sortedCombatants: this.getSortedCombatants(),
             })
           }
         >

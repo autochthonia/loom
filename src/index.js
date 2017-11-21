@@ -1,18 +1,17 @@
 import { ApolloClient } from 'apollo-client';
 import { ApolloProvider } from 'react-apollo';
+import { BatchHttpLink } from 'apollo-link-batch-http';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { WebSocketLink } from 'apollo-link-ws';
+import { injectGlobal } from 'styled-components';
 import { split } from 'apollo-client-preset';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { BatchHttpLink } from 'apollo-link-batch-http';
-import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { getMainDefinition } from 'apollo-utilities';
 
-import AddCombatant from './components/AddCombatant';
-import CombatantList from './components/CombatantList';
+import Routes from './routes';
 import registerServiceWorker from './registerServiceWorker';
 
 const serviceId = 'cja6cc8ww08ny0119esj7ljec';
@@ -63,10 +62,7 @@ const client = new ApolloClient({
 ReactDOM.render(
   <Router>
     <ApolloProvider client={client}>
-      <div>
-        <CombatantList />
-        <AddCombatant />
-      </div>
+      <Routes />
     </ApolloProvider>
   </Router>,
   document.getElementById('root'),

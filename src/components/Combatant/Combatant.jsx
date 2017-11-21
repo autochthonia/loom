@@ -1,7 +1,7 @@
-import { debounce } from 'lodash';
+import { gql } from 'apollo-client-preset';
+import { propType } from 'graphql-anywhere';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
 import TextInput, { Checkbox, NumberInput } from '../atoms/Input';
 
@@ -12,13 +12,18 @@ const CombatantWrapper = styled.div`
 `;
 
 class Combatant extends Component {
+  static fragments = {
+    combatant: gql`
+      fragment Combatant on Combatant {
+        id
+        name
+        initiative
+        turnOver
+      }
+    `,
+  };
   static propTypes = {
-    combatant: PropTypes.shape({
-      id: PropTypes.string,
-      name: PropTypes.string,
-      initiative: PropTypes.number,
-      turnOver: PropTypes.bool,
-    }).isRequired,
+    combatant: propType(Combatant.fragments.combatant).isRequired,
   };
   static defaultProps = {};
 

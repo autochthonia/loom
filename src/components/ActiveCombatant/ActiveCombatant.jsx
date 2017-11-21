@@ -1,15 +1,17 @@
+import { propType } from 'graphql-anywhere';
 import React from 'react';
-import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
+import Combatant from '../Combatant';
 
 export const ActiveCombatantWrapper = styled.div``;
 
 const ActiveCombatant = ({ activeCombatant: { name } }) => (
-  <ActiveCombatantWrapper>{name}</ActiveCombatantWrapper>
+  <ActiveCombatantWrapper>Active Combatant: {name}</ActiveCombatantWrapper>
 );
 
 ActiveCombatant.propTypes = {
-  activeCombatant: PropTypes.string,
+  activeCombatant: propType(Combatant.fragments.combatant),
 };
 
 export default ActiveCombatant;

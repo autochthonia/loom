@@ -59,6 +59,14 @@ const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+injectGlobal`
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+`;
+
 ReactDOM.render(
   <Router>
     <ApolloProvider client={client}>

@@ -4,7 +4,7 @@ import { graphql } from 'react-apollo';
 import Room from './Room';
 
 const query = gql`
-  query CurrentUserForLayout($roomId: ID!) {
+  query FetchRoom($roomId: ID!) {
     Room(id: $roomId) {
       id
       owner {

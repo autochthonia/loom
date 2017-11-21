@@ -1,6 +1,7 @@
 import { map, get, orderBy, head } from 'lodash';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+import FlipMove from 'react-flip-move';
 
 import ActiveCombatant from '../ActiveCombatant';
 import Combatant from '../Combatant';
@@ -50,9 +51,13 @@ class CombatantList extends Component {
     return (
       <CombatantListWrapper>
         <ActiveCombatant activeCombatant={head(this.getSortedCombatants())} />
-        {map(this.state.sortedCombatants, combatant => (
-          <Combatant key={combatant.id} combatant={combatant} />
-        ))}
+        
+        <FlipMove duration={400} easing="ease-in-out" staggerDelayBy={300}>
+          {map(this.state.sortedCombatants, combatant => (
+            <Combatant key={combatant.id} combatant={combatant} />
+          ))}
+        </FlipMove>
+
         <button
           onClick={() =>
             this.setState({

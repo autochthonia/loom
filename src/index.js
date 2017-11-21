@@ -6,6 +6,7 @@ import { split } from 'apollo-client-preset';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import { BatchHttpLink } from 'apollo-link-batch-http';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { getMainDefinition } from 'apollo-utilities';
@@ -16,8 +17,9 @@ import registerServiceWorker from './registerServiceWorker';
 
 const serviceId = 'cja6cc8ww08ny0119esj7ljec';
 
-const httpLink = new HttpLink({
+const httpLink = new BatchHttpLink({
   uri: `https://api.graph.cool/simple/v1/${serviceId}`,
+  batchInterval: 1000,
 });
 
 // const middlewareAuthLink = new ApolloLink((operation, forward) => {

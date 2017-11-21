@@ -1,9 +1,11 @@
 import { map, get, orderBy, head } from 'lodash';
+import FlipMove from 'react-flip-move';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import FlipMove from 'react-flip-move';
+import PropTypes from 'prop-types';
 
 import ActiveCombatant from '../ActiveCombatant';
+import AddCombatant from '../AddCombatant';
 import Combatant from '../Combatant';
 import mergeSorted from '../../utilities/mergeSorted';
 
@@ -13,8 +15,10 @@ export const CombatantListWrapper = styled.div`
 `;
 
 class CombatantList extends Component {
+  static propTypes = {
+    room: PropTypes.string.isRequired,
+  };
   static defaultProps = {};
-  static propTypes = {};
   state = {
     sortedCombatants: get(this.props, 'data.allCombatants', []),
   };
@@ -51,7 +55,7 @@ class CombatantList extends Component {
     return (
       <CombatantListWrapper>
         <ActiveCombatant activeCombatant={head(this.getSortedCombatants())} />
-        
+
         <FlipMove duration={400} easing="ease-in-out" staggerDelayBy={300}>
           {map(this.state.sortedCombatants, combatant => (
             <Combatant key={combatant.id} combatant={combatant} />
@@ -67,6 +71,7 @@ class CombatantList extends Component {
         >
           Sort Combatants
         </button>
+        <AddCombatant room={this.props.room} />
       </CombatantListWrapper>
     );
   }

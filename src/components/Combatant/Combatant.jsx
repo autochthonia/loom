@@ -30,10 +30,10 @@ class Combatant extends Component {
   _updateCombatant = async payload => {
     console.debug('!!! UPDATE COMBATANT !!!');
     const response = await this.props.updateCombatant({
-      ...this.props.combatant,
+      id: this.props.combatant.id,
       ...payload,
     });
-    // console.log(response);
+    console.debug(response);
   };
 
   render() {
@@ -42,12 +42,11 @@ class Combatant extends Component {
       <CombatantWrapper>
         <Checkbox
           checked={turnOver}
-          onChange={() => {
-            console.log('clicking checkbox');
+          onChange={() =>
             this._updateCombatant({
               turnOver: !this.props.combatant.turnOver,
-            });
-          }}
+            })
+          }
         />
         <NumberInput
           value={initiative}

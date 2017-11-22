@@ -14,7 +14,7 @@ const Load = ({ data, Wrapper, children }) => {
 };
 
 Load.propTypes = {
-  Wrapper: PropTypes.element,
+  Wrapper: PropTypes.oneOfType([PropTypes.string, PropTypes.func]),
   data: PropTypes.shape({
     loading: PropTypes.bool,
     error: PropTypes.bool,

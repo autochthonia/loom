@@ -6,7 +6,7 @@ import Combatant from '../Combatant';
 
 export const ActiveCombatantWrapper = styled.div``;
 
-const ActiveCombatant = ({ activeCombatant: { name } }) => (
+const ActiveCombatant = ({ activeCombatant: { name } = { name: 'None' } }) => (
   <ActiveCombatantWrapper>Active Combatant: {name}</ActiveCombatantWrapper>
 );
 

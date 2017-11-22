@@ -5,16 +5,21 @@ import AddCombatant from './AddCombatant';
 
 const query = gql`
   mutation createCombatantMutation(
-    $initiative: Int
     $name: String!
+    $room: ID!
+    $initiative: Int
     $turnOver: Boolean
   ) {
     createCombatant(
       name: $name
+      roomId: $room
       turnOver: $turnOver
       initiative: $initiative
     ) {
       id
+      room {
+        id
+      }
       name
       turnOver
       initiative

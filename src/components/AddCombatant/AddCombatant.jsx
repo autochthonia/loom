@@ -1,10 +1,17 @@
-import { gql } from 'apollo-client-preset';
+import { withRouter } from 'react-router';
 import React, { Component } from 'react';
-import { map } from 'lodash';
 
-class CombatantList extends Component {
+import PropTypes from 'prop-types';
+
+class AddCombatant extends Component {
+  static propTypes = {
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        room: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
+  };
   static defaultProps = {};
-  static propTypes = {};
   state = {
     name: '',
     initiative: 0,
@@ -15,12 +22,12 @@ class CombatantList extends Component {
     await this.props
       .mutate({
         variables: {
+          room: this.props.match.params.room,
           name: name || '',
           initiative: parseInt(initiative, 10) || 0,
         },
       })
       .then(res => {
-        console.log(res);
         this.setState({
           name: '',
           initiative: 0,
@@ -32,7 +39,6 @@ class CombatantList extends Component {
   };
 
   render() {
-    console.log(this.props);
     if (this.props.data && this.props.data.loading) {
       return <div>Loading</div>;
     }
@@ -65,4 +71,4 @@ class CombatantList extends Component {
   }
 }
 
-export default CombatantList;
+export default withRouter(AddCombatant);

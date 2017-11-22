@@ -7,20 +7,10 @@ import Room from './Room';
 const query = gql`
   query FetchRoom($roomId: ID!) {
     Room(id: $roomId) {
-      id
-      owner {
-        id
-      }
-      players {
-        id
-      }
-      combatants {
-        ... Combatant
-      }
-      turn
+      ... Room
     }
   }
-  ${Combatant.fragments.combatant}
+  ${Room.fragments.room}
 `;
 
 export default graphql(query, {

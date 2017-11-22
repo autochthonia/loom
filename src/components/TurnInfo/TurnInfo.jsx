@@ -24,8 +24,8 @@ class TurnInfo extends Component {
     this.props.subscribeToTurnUpdates();
   }
 
-  _advanceTurn = async () => {
-    await this.props
+  _advanceTurn = () =>
+    this.props
       .mutate({
         variables: {
           turn: this.props.data.Room.turn + 1,
@@ -34,7 +34,17 @@ class TurnInfo extends Component {
       .catch(e => {
         console.error(e);
       });
-  };
+
+  _resetTurn = () =>
+    this.props
+      .mutate({
+        variables: {
+          turn: 0,
+        },
+      })
+      .catch(e => {
+        console.error(e);
+      });
 
   render() {
     console.log(this.props);
@@ -46,6 +56,7 @@ class TurnInfo extends Component {
           <span>{this.props.data.Room.turn}</span>
         </div>
         <button onClick={this._advanceTurn}>Next Turn</button>
+        <button onClick={this._resetTurn}>Reset Turn Counter</button>
       </Load>
     );
   }

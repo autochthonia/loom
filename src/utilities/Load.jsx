@@ -1,4 +1,5 @@
 import React from 'react';
+import { isFunction } from 'lodash';
 import PropTypes from 'prop-types';
 
 const Load = ({ data, Wrapper, children }) => {
@@ -10,7 +11,7 @@ const Load = ({ data, Wrapper, children }) => {
     return <Wrapper>Error</Wrapper>;
   }
 
-  return <Wrapper>{children}</Wrapper>;
+  return <Wrapper>{isFunction(children) ? children() : children}</Wrapper>;
 };
 
 Load.propTypes = {

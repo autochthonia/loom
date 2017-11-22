@@ -3,6 +3,7 @@ import { propType } from 'graphql-anywhere';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
+import Combatant from '../Combatant/Combatant.jsx';
 import CombatantList from '../CombatantList';
 import Load from '../../utilities/Load';
 import TurnInfo from '../TurnInfo';
@@ -11,6 +12,8 @@ export const RoomWrapper = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 600px;
+  margin: 0 auto;
 `;
 const Header = styled.header`
   background: blue;
@@ -31,10 +34,18 @@ class Room extends Component {
     room: gql`
       fragment Room on Room {
         id
-        name
-        initiative
-        turnOver
+        owner {
+          id
+        }
+        players {
+          id
+        }
+        combatants {
+          ... Combatant
+        }
+        turn
       }
+      ${Combatant.fragments.combatant}
     `,
   };
   static propTypes = {
@@ -43,15 +54,18 @@ class Room extends Component {
   static defaultProps = {};
 
   render() {
-    console.log(this.props);
     return (
       <Load Wrapper={RoomWrapper} data={this.props.data}>
-        <Header>Room Name - owner - {this.props.match.params.room}</Header>
-        <Main>
-          <TurnInfo />
-          <CombatantList />
-        </Main>
-        <Footer>footer</Footer>
+        {() => (
+          <RoomWrapper>
+            <Header>Room Name - owner - {this.props.match.params.room}</Header>
+            <Main>
+              <TurnInfo />
+              <CombatantList turn={this.props.data.Room.turn} />
+            </Main>
+            <Footer>footer</Footer>
+          </RoomWrapper>
+        )}
       </Load>
     );
   }

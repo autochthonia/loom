@@ -16,11 +16,15 @@ export const CombatantListWrapper = styled.div`
 
 class CombatantList extends Component {
   static propTypes = {
-    room: PropTypes.string.isRequired,
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        room: PropTypes.string.isRequired,
+      }).isRequired,
+    }).isRequired,
   };
   static defaultProps = {};
   state = {
-    sortedCombatants: get(this.props, 'data.allCombatants', []),
+    sortedCombatants: get(this.props, 'data.Room.combatants', []),
   };
 
   componentDidMount() {
@@ -29,12 +33,12 @@ class CombatantList extends Component {
 
   componentWillReceiveProps(nextProps) {
     console.warn(
-      'CombatantList componentWillReceiveProps - has allCombatants changed?',
+      'CombatantList componentWillReceiveProps - has Room.combatants changed?',
     );
     this.setState({
       sortedCombatants: mergeSorted(
         this.state.sortedCombatants,
-        get(nextProps, 'data.allCombatants', []),
+        get(nextProps, 'data.Room.combatants', []),
       ),
     });
   }
@@ -71,7 +75,7 @@ class CombatantList extends Component {
         >
           Sort Combatants
         </button>
-        <AddCombatant room={this.props.room} />
+        <AddCombatant />
       </CombatantListWrapper>
     );
   }

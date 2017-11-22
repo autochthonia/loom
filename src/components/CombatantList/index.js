@@ -1,18 +1,20 @@
 import { graphql } from 'react-apollo';
-import { map, reject } from 'lodash';
+import { map, reject, merge } from 'lodash';
+import { withRouter } from 'react-router';
 import gql from 'graphql-tag';
 
+import Combatant from '../Combatant';
 import CombatantList from './CombatantList';
 
 const query = gql`
-  {
-    allCombatants {
-      id
-      name
-      turnOver
-      initiative
+  query FetchRoom($roomId: ID!) {
+    Room(id: $roomId) {
+      combatants {
+        ... Combatant
+      }
     }
   }
+  ${Combatant.fragments.combatant}
 `;
 
 const subscription = gql`
@@ -20,67 +22,91 @@ const subscription = gql`
     Combatant {
       mutation
       node {
-        id
-        name
-        initiative
-        turnOver
+        ... Combatant
       }
       previousValues {
         id
       }
     }
   }
+  ${Combatant.fragments.combatant}
 `;
 
-export default graphql(query, {
-  props: props => {
-    const { data, data: { subscribeToMore }, ownProps } = props;
-    return {
-      ...ownProps,
-      data,
-      subscribeToCombatantUpdates: () =>
-        subscribeToMore({
-          document: subscription,
-          updateQuery: (previous, response) => {
-            console.debug('CombatantList _subscribeToCombatants update:');
-            console.debug('previous: \n', previous);
-            console.debug('response: \n', response);
+export default withRouter(
+  graphql(query, {
+    options: ({ match: { params: { room: roomId } } }) => ({
+      variables: { roomId },
+    }),
+    props: props => {
+      const {
+        data,
+        data: { subscribeToMore },
+        ownProps,
+        ownProps: { match: { params: { room: roomId } } },
+      } = props;
+      return {
+        ...ownProps,
+        data,
+        subscribeToCombatantUpdates: () =>
+          subscribeToMore({
+            document: subscription,
+            updateQuery: (previous, response) => {
+              console.debug('CombatantList _subscribeToCombatants update:');
+              console.debug('previous: \n', previous);
+              console.debug('response: \n', response);
 
-            const {
-              subscriptionData: {
-                data: {
-                  Combatant: { mutation, node: Combatant, previousValues },
+              const {
+                subscriptionData: {
+                  data: {
+                    Combatant: { mutation, node: Combatant, previousValues },
+                  },
                 },
-              },
-            } = response;
+              } = response;
 
-            switch (mutation) {
-              case 'CREATED':
-                return {
-                  ...previous,
-                  allCombatants: [...previous.allCombatants, Combatant],
-                };
-              case 'DELETED':
-                return {
-                  ...previous,
-                  allCombatants: reject(previous.allCombatants, {
-                    id: previousValues.id,
-                  }),
-                };
-              case 'UPDATED':
-                return {
-                  ...previous,
-                  allCombatants: map(
-                    previous.allCombatants,
-                    c => (c.id === Combatant.id ? Combatant : c),
-                  ),
-                };
-              default:
-                console.error(`unknown mutation type ${mutation}`);
-                return previous;
-            }
-          },
-        }),
-    };
-  },
-})(CombatantList);
+              switch (mutation) {
+                case 'CREATED':
+                  return {
+                    ...previous,
+                    Room: {
+                      id: roomId,
+                      ...previous.Room,
+                      combatants: [...previous.Room.combatants, Combatant],
+                    },
+                  };
+                case 'DELETED':
+                  return {
+                    ...previous,
+                    Room: {
+                      id: roomId,
+                      ...previous.Room,
+                      combatants: reject(previous.Room.combatants, {
+                        id: previousValues.id,
+                      }),
+                    },
+                  };
+                case 'UPDATED': {
+                  const body = {
+                    ...previous,
+                    Room: {
+                      id: roomId,
+                      ...previous.Room,
+                      combatants: map(
+                        previous.Room.combatants,
+                        c =>
+                          c.id === Combatant.id ? merge({}, c, Combatant) : c,
+                      ),
+                    },
+                  };
+                  console.log(body);
+                  return body;
+                }
+                default:
+                  console.error(`unknown mutation type ${mutation}`);
+                  return previous;
+              }
+            },
+          }),
+      };
+    },
+  })(CombatantList),
+);

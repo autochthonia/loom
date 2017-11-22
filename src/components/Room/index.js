@@ -1,6 +1,7 @@
 import { gql } from 'apollo-client-preset';
 import { graphql } from 'react-apollo';
 
+import Combatant from '../Combatant';
 import Room from './Room';
 
 const query = gql`
@@ -13,9 +14,13 @@ const query = gql`
       players {
         id
       }
+      combatants {
+        ... Combatant
+      }
       turn
     }
   }
+  ${Combatant.fragments.combatant}
 `;
 
 export default graphql(query, {

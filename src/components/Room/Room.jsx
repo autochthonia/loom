@@ -1,8 +1,11 @@
+import { gql } from 'apollo-client-preset';
+import { propType } from 'graphql-anywhere';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
 import CombatantList from '../CombatantList';
 import Load from '../../utilities/Load';
+import TurnInfo from '../TurnInfo';
 
 export const RoomWrapper = styled.div`
   display: flex;
@@ -24,25 +27,34 @@ const Footer = styled.footer`
 `;
 
 class Room extends Component {
-  constructor(props) {
-    super(props);
-  }
+  static fragments = {
+    room: gql`
+      fragment Room on Room {
+        id
+        name
+        initiative
+        turnOver
+      }
+    `,
+  };
+  static propTypes = {
+    room: propType(Room.fragments.room).isRequired,
+  };
+  static defaultProps = {};
 
   render() {
+    console.log(this.props);
     return (
       <Load Wrapper={RoomWrapper} data={this.props.data}>
         <Header>Room Name - owner - {this.props.match.params.room}</Header>
         <Main>
-          <CombatantList room={this.props.match.params.room} />
+          <TurnInfo />
+          <CombatantList />
         </Main>
         <Footer>footer</Footer>
       </Load>
     );
   }
 }
-
-Room.propTypes = {};
-
-Room.defaultProps = {};
 
 export default Room;

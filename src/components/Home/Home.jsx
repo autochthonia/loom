@@ -1,13 +1,19 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-
+import { Link } from 'react-router-dom';
+import React from 'react';
 
 const Home = ({}) => (
-  <div className="Home"></div>
+  <div
+    className="Home"
+    style={{ paddingTop: '200px', margin: '0 auto', width: '600px' }}
+  >
+    <Link to="/cja973seudulw0131rtu9gge5">
+      This is the only room I've created so far
+    </Link>
+  </div>
 );
 
-Home.propTypes = {}
+Home.propTypes = {};
 
-Home.defaultProps = {}
+Home.defaultProps = {};
 
-export default Home
+export default Home;

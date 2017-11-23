@@ -8,7 +8,9 @@ import TextInput, { Checkbox, NumberInput } from '../atoms/Input';
 const CombatantWrapper = styled.div`
   margin: 20px auto;
   padding: 4px;
-  background: cornflowerblue;
+  background: ${props =>
+    props.turnOver ? 'grey' : props.active ? 'gold' : 'cornflowerblue'};
+  transition: background-color 0.5s ease;
 `;
 
 class Combatant extends Component {
@@ -37,9 +39,11 @@ class Combatant extends Component {
   };
 
   render() {
+    const { active } = this.props;
     const { name, initiative, id, turnOver } = this.props.combatant;
+    const Wrapper = CombatantWrapper;
     return (
-      <CombatantWrapper>
+      <Wrapper turnOver={turnOver} active={active}>
         <Checkbox
           checked={turnOver}
           onChange={() =>
@@ -66,7 +70,7 @@ class Combatant extends Component {
           }
         />
         <button onClick={this.props.deleteCombatant}>X</button>
-      </CombatantWrapper>
+      </Wrapper>
     );
   }
 }

@@ -27,15 +27,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "lint": "eslint src",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "heroku": "git push heroku master"
   },
   "jest": {
-    "setupFiles": [
-      "./src/setupTests.js"
-    ],
-    "snapshotSerializers": [
-      "enzyme-to-json/serializer"
-    ]
+    "setupFiles": ["./src/setupTests.js"],
+    "snapshotSerializers": ["enzyme-to-json/serializer"]
   },
   "devDependencies": {
     "babel-plugin-transform-class-properties": "^6.24.1",

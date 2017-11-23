@@ -1,4 +1,4 @@
-import { map, get, orderBy, head } from 'lodash';
+import { map, get, orderBy, head, reject, reduce, max } from 'lodash';
 import FlipMove from 'react-flip-move';
 import React, { Component } from 'react';
 import styled from 'styled-components';
@@ -63,13 +63,29 @@ class CombatantList extends Component {
       return <CombatantListWrapper>Error</CombatantListWrapper>;
     }
 
+    const sortedCombatants = this.getSortedCombatants();
+    const activeSortedCombatants = reject(sortedCombatants, { turnOver: true });
+    let isCombatantStateOrdered = true;
+
+    try {
+      isCombatantStateOrdered = this.state.sortedCombatants.every(
+        ({ initiative }, i, arr) =>
+          i === 0 || initiative <= arr[i - 1].initiative,
+      );
+    } catch (e) {
+      console.error('Could not determine if combatant state is ordered:\n', e);
+    }
+
     return (
       <CombatantListWrapper>
-        <ActiveCombatant activeCombatant={head(this.getSortedCombatants())} />
-
+        <ActiveCombatant activeCombatant={head(activeSortedCombatants)} />
         <FlipMove duration={400} easing="ease-in-out" staggerDelayBy={300}>
           {map(this.state.sortedCombatants, combatant => (
-            <Combatant key={combatant.id} combatant={combatant} />
+            <Combatant
+              key={combatant.id}
+              combatant={combatant}
+              active={head(activeSortedCombatants) === combatant}
+            />
           ))}
         </FlipMove>
 
@@ -79,6 +95,7 @@ class CombatantList extends Component {
               sortedCombatants: this.getSortedCombatants(),
             })
           }
+          disabled={isCombatantStateOrdered}
         >
           Sort Combatants
         </button>

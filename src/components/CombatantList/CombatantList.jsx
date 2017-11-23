@@ -35,16 +35,23 @@ class CombatantList extends Component {
     console.warn(
       'CombatantList componentWillReceiveProps - has Room.combatants changed?',
     );
+    if (this.props.turn !== nextProps.turn) {
+      console.debug('Room detected turn change');
+    }
+    const mergedCombatants = mergeSorted(
+      this.state.sortedCombatants,
+      get(nextProps, 'data.Room.combatants', []),
+    );
     this.setState({
-      sortedCombatants: mergeSorted(
-        this.state.sortedCombatants,
-        get(nextProps, 'data.Room.combatants', []),
-      ),
+      sortedCombatants:
+        this.props.turn !== nextProps.turn
+          ? this.getSortedCombatants(mergedCombatants)
+          : mergedCombatants,
     });
   }
 
-  getSortedCombatants = () =>
-    orderBy(this.state.sortedCombatants, ['initiative'], ['desc']);
+  getSortedCombatants = (combatants = this.state.sortedCombatants) =>
+    orderBy(combatants, ['initiative'], ['desc']);
 
   render() {
     console.debug('CombatantList props:\n', this.props);

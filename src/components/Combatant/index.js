@@ -1,6 +1,14 @@
+import { compose, graphql } from 'react-apollo';
+import { debounce, omit } from 'lodash';
 import { gql } from 'apollo-client-preset';
-import { graphql } from 'react-apollo';
-import { compose } from 'react-apollo';
+import {
+  mapProps,
+  pure,
+  withHandlers,
+  withState,
+  withPropsOnChange,
+} from 'recompose';
+
 import Combatant from './Combatant';
 
 const updateCombatantQuery = gql`
@@ -24,6 +32,25 @@ const updateCombatantQuery = gql`
   }
 `;
 
+const apolloUpdateCombatant = graphql(updateCombatantQuery, {
+  props: ({ ownProps, mutate }) => ({
+    _updateCombatant: Combatant => {
+      console.debug('UPDATING COMBATANT');
+      mutate({
+        variables: { ...Combatant, id: ownProps.combatant.id },
+        optimisticResponse: {
+          __typename: 'Mutation',
+          updateCombatant: {
+            __typename: 'Combatant',
+            ...Combatant,
+            id: ownProps.combatant.id,
+          },
+        },
+      });
+    },
+  }),
+});
+
 const deleteCombatantQuery = gql`
   mutation deleteCombatantMutation($id: ID!) {
     deleteCombatant(id: $id) {
@@ -32,29 +59,53 @@ const deleteCombatantQuery = gql`
   }
 `;
 
+const apolloDeleteCombatant = graphql(deleteCombatantQuery, {
+  props: ({ ownProps, mutate }) => ({
+    deleteCombatant: () =>
+      mutate({
+        variables: { id: ownProps.combatant.id },
+      }),
+  }),
+});
+
 export default compose(
-  graphql(updateCombatantQuery, {
-    props: ({ ownProps, mutate }) => ({
-      updateCombatant: Combatant => {
-        return mutate({
-          variables: { ...Combatant },
-          optimisticResponse: {
-            __typename: 'Mutation',
-            updateCombatant: {
-              __typename: 'Combatant',
-              ...Combatant,
-            },
-          },
-        });
-      },
-    }),
+  // provide apollo mutate bindings
+  apolloUpdateCombatant,
+  apolloDeleteCombatant,
+  // create a debounced _updateCombatant when the function changes
+  withPropsOnChange(['_updateCombatant'], ({ _updateCombatant }) => {
+    console.warn('Combatant container _updateCombatant withPropsOnChange');
+    return {
+      _debouncedUpdateCombatant: debounce(_updateCombatant, 1000, {
+        maxWait: 4000,
+      }),
+    };
   }),
-  graphql(deleteCombatantQuery, {
-    props: ({ ownProps, mutate }) => ({
-      deleteCombatant: () =>
-        mutate({
-          variables: { id: ownProps.combatant.id },
-        }),
-    }),
+  // provide state for use with debouncer
+  withState('combatantState', '_updateCombatantState', ({ combatant }) => ({
+    ...combatant,
+  })),
+  // Handler for updateCombatant that provides home-made optimistic + debounced updating
+  withHandlers({
+    updateCombatant: ({
+      _debouncedUpdateCombatant,
+      _updateCombatantState,
+      combatantState,
+    }) => payload => {
+      _updateCombatantState({ ...combatantState, ...payload });
+      _debouncedUpdateCombatant({ ...combatantState, ...payload });
+    },
   }),
+  // lifecycle willReceiveProps to update received state
+  // cleanup
+  mapProps(props => ({
+    ...omit(props, [
+      '_updateCombatant',
+      '_debouncedUpdateCombatant',
+      '_updateCombatantState',
+      'combatantState',
+    ]),
+    combatant: props.combatantState,
+  })),
+  pure,
 )(Combatant);

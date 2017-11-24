@@ -1,7 +1,10 @@
 import { gql } from 'apollo-client-preset';
+import { noop } from 'lodash';
 import { propType } from 'graphql-anywhere';
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
+
+import PropTypes from 'prop-types';
 
 import TextInput, { Checkbox, NumberInput } from '../atoms/Input';
 
@@ -13,66 +16,73 @@ const CombatantWrapper = styled.div`
   transition: background-color 0.5s ease;
 `;
 
-class Combatant extends Component {
-  static fragments = {
-    combatant: gql`
-      fragment Combatant on Combatant {
-        id
-        name
-        initiative
-        turnOver
+/**
+ * Displays a Combatant
+ * @param   {Boolean}   active          Combatant has highest init in combat and !turnOver
+ * @param   {Object}    combatant       Combatant object from database
+ * @param   {ID}        id              GraphQL ID
+ * @param   {Number}    initiative      Initiative count, can be negative
+ * @param   {Boolean}   turnOver        Whether Combatant has already acted this turn
+ * @param   {Function}  updateCombatant Handler to update a field on this combatant
+ * @param   {Function}  deleteCombatant Handler to delete this combatant
+ * @returns {Component}                 Returns component to be enhanced
+ */
+const Combatant = ({
+  active,
+  combatant: { name, initiative, id, turnOver },
+  updateCombatant,
+  deleteCombatant,
+}) => (
+  <CombatantWrapper turnOver={turnOver} active={active}>
+    <Checkbox
+      checked={turnOver}
+      onChange={() =>
+        updateCombatant({
+          turnOver: !turnOver,
+        })
       }
-    `,
-  };
-  static propTypes = {
-    combatant: propType(Combatant.fragments.combatant).isRequired,
-  };
-  static defaultProps = {};
+    />
+    <NumberInput
+      value={initiative}
+      onChange={({ target: { value } }) =>
+        updateCombatant({
+          initiative: parseInt(value, 10) || 0,
+        })
+      }
+    />
+    -
+    <TextInput
+      value={name}
+      onChange={({ target: { value } }) =>
+        updateCombatant({
+          name: value,
+        })
+      }
+    />
+    <button onClick={deleteCombatant}>X</button>
+  </CombatantWrapper>
+);
 
-  _updateCombatant = async payload => {
-    console.debug('!!! UPDATE COMBATANT !!!');
-    const response = await this.props.updateCombatant({
-      id: this.props.combatant.id,
-      ...payload,
-    });
-    console.debug(response);
-  };
-
-  render() {
-    const { active } = this.props;
-    const { name, initiative, id, turnOver } = this.props.combatant;
-    const Wrapper = CombatantWrapper;
-    return (
-      <Wrapper turnOver={turnOver} active={active}>
-        <Checkbox
-          checked={turnOver}
-          onChange={() =>
-            this._updateCombatant({
-              turnOver: !this.props.combatant.turnOver,
-            })
-          }
-        />
-        <NumberInput
-          value={initiative}
-          onChange={({ target: { value } }) =>
-            this._updateCombatant({
-              initiative: parseInt(value, 10) || 0,
-            })
-          }
-        />
-        -
-        <TextInput
-          value={name}
-          onChange={({ target: { value } }) =>
-            this._updateCombatant({
-              name: value,
-            })
-          }
-        />
-        <button onClick={this.props.deleteCombatant}>X</button>
-      </Wrapper>
-    );
-  }
-}
+Combatant.fragments = {
+  combatant: gql`
+    fragment Combatant on Combatant {
+      id
+      name
+      initiative
+      turnOver
+    }
+  `,
+};
+Combatant.propTypes = {
+  combatant: propType(Combatant.fragments.combatant).isRequired,
+  active: PropTypes.bool,
+  updateCombatant: PropTypes.func,
+  deleteCombatant: PropTypes.func,
+};
+Combatant.defaultProps = {
+  active: false,
+  updateCombatant: noop,
+  deleteCombatant: noop,
+};
 
 export default Combatant;

@@ -1,7 +1,8 @@
-import { map, get, orderBy, head, reject, reduce, max } from 'lodash';
+import { map, get, orderBy, head, reject } from 'lodash';
 import FlipMove from 'react-flip-move';
 import React, { Component } from 'react';
 import styled from 'styled-components';
+
 import PropTypes from 'prop-types';
 
 import ActiveCombatant from '../ActiveCombatant';

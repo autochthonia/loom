@@ -1,7 +1,7 @@
 # Loom
 ## A Combat manager for Exalted 3rd Edition
-- (Deployed demo)[http://ex3-loom.herokuapp.com]
-- (Storybook)[https://autochthonia.github.io/loom/]
+- [Deployed demo](http://ex3-loom.herokuapp.com)
+- [Storybook](https://autochthonia.github.io/loom/)
 
 ### Todo:
 #### Tracker:

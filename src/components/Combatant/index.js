@@ -72,7 +72,8 @@ export default compose(
   // provide apollo mutate bindings
   apolloUpdateCombatant,
   apolloDeleteCombatant,
-  // create a debounced _updateCombatant when the function changes
+  // create a debounced _updateCombatant when the function changes. Seems to be re-creating
+  // every time a mutate request comes back. Could it have to do with optimistic updating?
   withPropsOnChange(['_updateCombatant'], ({ _updateCombatant }) => {
     console.warn('Combatant container _updateCombatant withPropsOnChange');
     return {
@@ -81,11 +82,14 @@ export default compose(
       }),
     };
   }),
-  // provide state for use with debouncer
+  // provide state for use with debouncer. Will automatically update upon receiving new props
+  // from apollo!
   withState('combatantState', '_updateCombatantState', ({ combatant }) => ({
     ...combatant,
   })),
-  // Handler for updateCombatant that provides home-made optimistic + debounced updating
+  // Handler for updateCombatant that provides home-made optimistic + debounced updating.
+  // Immediately updates combatantState (providing presentational component with new data) and
+  // calls debounced updateCombatant from Apollo in order to send debounced network requests
   withHandlers({
     updateCombatant: ({
       _debouncedUpdateCombatant,
@@ -96,8 +100,8 @@ export default compose(
       _debouncedUpdateCombatant({ ...combatantState, ...payload });
     },
   }),
-  // lifecycle willReceiveProps to update received state
-  // cleanup
+  // cleanup - remove the private props spawned through recompose and override combatant with
+  // our custom combatantState
   mapProps(props => ({
     ...omit(props, [
       '_updateCombatant',

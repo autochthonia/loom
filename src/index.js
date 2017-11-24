@@ -14,6 +14,11 @@ import { getMainDefinition } from 'apollo-utilities';
 import Routes from './routes';
 import registerServiceWorker from './registerServiceWorker';
 
+if (process.env.NODE_ENV !== 'production') {
+  const { whyDidYouUpdate } = require('why-did-you-update');
+  whyDidYouUpdate(React);
+}
+
 const serviceId = 'cja6cc8ww08ny0119esj7ljec';
 
 const httpLink = new BatchHttpLink({

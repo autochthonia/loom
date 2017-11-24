@@ -34,7 +34,8 @@
     "update": "git push origin && yarn run heroku",
     "heroku": "git push heroku master",
     "storybook": "start-storybook -p 9009 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "deploy-storybook": "storybook-to-ghpages"
   },
   "jest": {
     "setupFiles": [
@@ -49,6 +50,7 @@
     "@storybook/addon-actions": "^3.2.16",
     "@storybook/addon-links": "^3.2.16",
     "@storybook/react": "^3.2.16",
+    "@storybook/storybook-deployer": "^2.0.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "prop-types": "^15.6.0",

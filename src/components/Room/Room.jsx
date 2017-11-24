@@ -3,7 +3,7 @@ import { propType } from 'graphql-anywhere';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 
-import Combatant from '../Combatant/Combatant.jsx';
+import Combatant from '../Combatant/Combatant';
 import CombatantList from '../CombatantList';
 import Load from '../../utilities/Load';
 import TurnInfo from '../TurnInfo';

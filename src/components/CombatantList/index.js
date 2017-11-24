@@ -3,7 +3,7 @@ import { map, reject, merge } from 'lodash';
 import { withRouter } from 'react-router';
 import gql from 'graphql-tag';
 
-import Combatant from '../Combatant';
+import Combatant from '../Combatant/Combatant';
 import CombatantList from './CombatantList';
 
 const query = gql`

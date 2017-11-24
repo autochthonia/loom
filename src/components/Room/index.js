@@ -1,7 +1,6 @@
 import { gql } from 'apollo-client-preset';
 import { graphql } from 'react-apollo';
 
-import Combatant from '../Combatant';
 import Room from './Room';
 
 const query = gql`

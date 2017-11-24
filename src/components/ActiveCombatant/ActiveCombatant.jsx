@@ -2,7 +2,7 @@ import { propType } from 'graphql-anywhere';
 import React from 'react';
 import styled from 'styled-components';
 
-import Combatant from '../Combatant';
+import Combatant from '../Combatant/Combatant';
 
 export const ActiveCombatantWrapper = styled.div``;
 

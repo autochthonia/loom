@@ -82,8 +82,8 @@ export default compose(
       }),
     };
   }),
-  // provide state for use with debouncer. Will automatically update upon receiving new props
-  // from apollo!
+  // provide state for use with debouncer (holds data between debounced server requests). Bonus:
+  // will automatically update upon receiving new props from apollo!
   withState('combatantState', '_updateCombatantState', ({ combatant }) => ({
     ...combatant,
   })),

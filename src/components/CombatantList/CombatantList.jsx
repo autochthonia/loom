@@ -100,7 +100,7 @@ class CombatantList extends Component {
         >
           Sort Combatants
         </button>
-        <AddCombatant />
+        <AddCombatant room={this.props.match.params.room} />
       </CombatantListWrapper>
     );
   }

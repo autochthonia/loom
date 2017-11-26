@@ -1,74 +1,35 @@
-import { withRouter } from 'react-router';
-import React, { Component } from 'react';
+import React from 'react';
 
 import PropTypes from 'prop-types';
 
-class AddCombatant extends Component {
-  static propTypes = {
-    match: PropTypes.shape({
-      params: PropTypes.shape({
-        room: PropTypes.string.isRequired,
-      }).isRequired,
-    }).isRequired,
-  };
-  static defaultProps = {};
-  state = {
-    name: '',
-    initiative: 0,
-  };
+const AddCombatant = ({
+  updateNewCombatant,
+  newCombatantState: { name, initiative },
+  newCombatantRequest,
+}) => (
+  <div>
+    <input
+      value={name}
+      onChange={({ target: { value } }) => updateNewCombatant({ name: value })}
+      type="text"
+    />
+    <input
+      value={initiative}
+      onChange={({ target: { value } }) => updateNewCombatant({ initiative: parseInt(value, 10) })}
+      type="number"
+    />
+    <input type="submit" onClick={newCombatantRequest} value="Add Combatant" />
+  </div>
+);
 
-  _createCombatant = async () => {
-    const { name = '', initiative = 0 } = this.state;
-    await this.props
-      .mutate({
-        variables: {
-          room: this.props.match.params.room,
-          name: name || '',
-          initiative: parseInt(initiative, 10) || 0,
-        },
-      })
-      .then(res => {
-        this.setState({
-          name: '',
-          initiative: 0,
-        });
-      })
-      .catch(e => {
-        console.error(e);
-      });
-  };
+AddCombatant.propTypes = {
+  updateNewCombatant: PropTypes.func.isRequired,
+  newCombatantRequest: PropTypes.func.isRequired,
+  newCombatantState: PropTypes.shape({
+    name: PropTypes.string,
+    initiative: PropTypes.number,
+  }).isRequired,
+  room: PropTypes.string,
+};
 
-  render() {
-    if (this.props.data && this.props.data.loading) {
-      return <div>Loading</div>;
-    }
-
-    if (this.props.data && this.props.data.error) {
-      return <div>Error</div>;
-    }
-
-    return (
-      <div>
-        <input
-          value={this.state.name}
-          onChange={({ target: { value } }) => this.setState({ name: value })}
-          type="text"
-        />
-        <input
-          value={this.state.initiative}
-          onChange={({ target: { value } }) =>
-            this.setState({ initiative: value })
-          }
-          type="number"
-        />
-        <input
-          type="submit"
-          onClick={this._createCombatant}
-          value="Add Combatant"
-        />
-      </div>
-    );
-  }
-}
-
-export default withRouter(AddCombatant);
+export default AddCombatant;

@@ -33,9 +33,7 @@ class CombatantList extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.warn(
-      'CombatantList componentWillReceiveProps - has Room.combatants changed?',
-    );
+    console.warn('CombatantList componentWillReceiveProps - has Room.combatants changed?');
     if (this.props.turn !== nextProps.turn) {
       console.debug('Room detected turn change');
     }
@@ -70,8 +68,7 @@ class CombatantList extends Component {
 
     try {
       isCombatantStateOrdered = this.state.sortedCombatants.every(
-        ({ initiative }, i, arr) =>
-          i === 0 || initiative <= arr[i - 1].initiative,
+        ({ initiative }, i, arr) => i === 0 || initiative <= arr[i - 1].initiative,
       );
     } catch (e) {
       console.error('Could not determine if combatant state is ordered:\n', e);

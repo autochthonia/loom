@@ -23,6 +23,7 @@
     "recompose": "^0.26.0",
     "regenerator-runtime": "^0.11.0",
     "styled-components": "^2.2.3",
+    "styled-components-mixins": "^0.0.5",
     "subscriptions-transport-ws": "^0.9.1"
   },
   "scripts": {

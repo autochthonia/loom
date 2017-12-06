@@ -1,10 +1,12 @@
+import { compose, lifecycle, mapProps, withStateHandlers } from 'recompose';
+import { get, map, merge, reject, orderBy, head } from 'lodash';
 import { graphql } from 'react-apollo';
-import { map, reject, merge } from 'lodash';
 import { withRouter } from 'react-router';
 import gql from 'graphql-tag';
 
 import Combatant from '../Combatant/Combatant';
 import CombatantList from './CombatantList';
+import mergeSorted from '../../utilities/mergeSorted';
 
 const query = gql`
   query FetchRoom($roomId: ID!) {
@@ -32,7 +34,8 @@ const subscription = gql`
   ${Combatant.fragments.combatant}
 `;
 
-export default withRouter(
+export default compose(
+  withRouter,
   graphql(query, {
     options: ({ match: { params: { room: roomId } } }) => ({
       variables: { roomId },
@@ -108,5 +111,71 @@ export default withRouter(
           }),
       };
     },
-  })(CombatantList),
-);
+  }),
+  withStateHandlers(
+    props => ({
+      combatantState: get(props, 'data.Room.combatants', []),
+    }),
+    {
+      sortCombatants: ({ combatantState }) => () => ({
+        combatantState: orderBy(combatantState, ['initiative'], ['desc']),
+      }),
+    },
+  ),
+  lifecycle({
+    componentDidMount() {
+      this.props.subscribeToCombatantUpdates();
+    },
+    componentWillReceiveProps(nextProps) {
+      console.warn(
+        'CombatantList componentWillReceiveProps - has Room.combatants changed?',
+      );
+      if (this.props.turn !== nextProps.turn) {
+        console.debug('Room detected turn change');
+      }
+      const mergedCombatants = mergeSorted(
+        this.props.combatantState,
+        get(nextProps, 'data.Room.combatants', []),
+      );
+      this.setState({
+        combatantState:
+          this.props.turn !== nextProps.turn
+            ? this.props.getSortedCombatants(mergedCombatants)
+            : mergedCombatants,
+      });
+    },
+  }),
+  mapProps(props => {
+    console.log(props);
+    const {
+      sortCombatants,
+      combatantState,
+      match: { params: { roomId } },
+    } = props;
+    let isCombatantStateOrdered = true;
+    try {
+      isCombatantStateOrdered = props.combatantState.every(
+        ({ initiative }, i, arr) =>
+          i === 0 || initiative <= arr[i - 1].initiative,
+      );
+    } catch (e) {
+      console.error('Could not determine if combatant state is ordered:\n', e);
+    }
+    return {
+      roomId,
+      combatants: combatantState,
+      isCombatantStateOrdered,
+      sortCombatants,
+      activeCombatant: head(
+        orderBy(
+          reject(combatantState, { turnOver: true }),
+          ['initiative'],
+          ['desc'],
+        ),
+      ),
+    };
+  }),
+)(CombatantList);
+
+// getSortedCombatants = (combatants = this.state.sortedCombatants) =>
+//   orderBy(combatants, ['initiative'], ['desc']);
